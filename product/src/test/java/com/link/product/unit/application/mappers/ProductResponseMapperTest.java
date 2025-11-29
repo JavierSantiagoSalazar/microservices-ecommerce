@@ -1,6 +1,7 @@
-package com.link.product.application.mappers;
+package com.link.product.unit.application.mappers;
 
 import com.link.product.application.dto.ProductResponse;
+import com.link.product.application.mappers.ProductResponseMapper;
 import com.link.product.domain.model.Product;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

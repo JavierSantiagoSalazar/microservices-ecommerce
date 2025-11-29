@@ -1,4 +1,4 @@
-package com.link.product.domain.usecase;
+package com.link.product.unit.domain.usecase;
 
 
 import com.link.product.domain.exceptions.ProductAlreadyExistsException;
@@ -6,6 +6,7 @@ import com.link.product.domain.exceptions.ProductNotFoundException;
 import com.link.product.domain.model.PageDomain;
 import com.link.product.domain.model.Product;
 import com.link.product.domain.spi.ProductPersistencePort;
+import com.link.product.domain.usecase.ProductUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

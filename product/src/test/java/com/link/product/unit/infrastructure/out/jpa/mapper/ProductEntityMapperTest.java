@@ -1,7 +1,8 @@
-package com.link.product.infrastructure.out.jpa.mapper;
+package com.link.product.unit.infrastructure.out.jpa.mapper;
 
 import com.link.product.domain.model.Product;
 import com.link.product.infrastructure.out.jpa.entity.ProductEntity;
+import com.link.product.infrastructure.out.jpa.mapper.ProductEntityMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
