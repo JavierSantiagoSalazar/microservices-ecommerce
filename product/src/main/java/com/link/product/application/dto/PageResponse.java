@@ -1,4 +1,4 @@
-package com.pragma.emazon_stock.domain.model;
+package com.link.product.application.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,13 +7,13 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class Pagination<T> {
+public class PageResponse<T> {
 
-    private List<T> items;
-    private Integer pageNo;
-    private Integer pageSize;
-    private Long totalItems;
-    private Integer totalPages;
-    private Boolean isLastPage;
+    private List<T> content;
+    private int pageNumber;
+    private int pageSize;
+    private long totalElements;
+    private int totalPages;
+    private boolean last;
 
 }
