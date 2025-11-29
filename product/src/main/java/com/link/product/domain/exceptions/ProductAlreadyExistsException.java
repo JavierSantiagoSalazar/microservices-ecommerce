@@ -1,8 +1,8 @@
-package com.pragma.emazon_stock.domain.exceptions;
+package com.link.product.domain.exceptions;
 
-public class ArticleAlreadyExistsException extends RuntimeException{
+public class ProductAlreadyExistsException extends RuntimeException{
 
-    public ArticleAlreadyExistsException() {
+    public ProductAlreadyExistsException() {
         super();
     }
 }

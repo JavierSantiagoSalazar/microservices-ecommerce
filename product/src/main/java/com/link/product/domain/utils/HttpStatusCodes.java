@@ -1,13 +1,13 @@
-package com.pragma.emazon_stock.domain.utils;
+package com.link.product.domain.utils;
 
 import lombok.Getter;
 
-import static com.pragma.emazon_stock.domain.utils.Constants.UTILITY_CLASS;
+import static com.link.product.domain.utils.Constants.UTILITY_CLASS;
 
 @Getter
-public class HttpStatusCode {
+public class HttpStatusCodes {
 
-    private HttpStatusCode() {
+    private HttpStatusCodes() {
         throw new IllegalStateException(UTILITY_CLASS);
     }
 

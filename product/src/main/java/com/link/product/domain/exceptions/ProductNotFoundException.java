@@ -1,18 +1,16 @@
-package com.pragma.emazon_stock.domain.exceptions;
+package com.link.product.domain.exceptions;
 
-import com.pragma.emazon_stock.domain.utils.Constants;
+import com.link.product.domain.utils.Constants;
 import lombok.Getter;
 
-import java.util.List;
-
 @Getter
-public class ArticleNotFoundException extends RuntimeException {
+public class ProductNotFoundException extends RuntimeException {
 
-    private final List<Integer> notFoundIds;
+    private final Long notFoundId;
 
-    public ArticleNotFoundException(List<Integer> notFoundIds) {
-        super(Constants.ARTICLE_DOES_NOT_EXIST);
-        this.notFoundIds = notFoundIds;
+    public ProductNotFoundException(Long notFoundId) {
+        super(Constants.PRODUCT_DOES_NOT_EXIST_MESSAGE);
+        this.notFoundId = notFoundId;
     }
 
 }

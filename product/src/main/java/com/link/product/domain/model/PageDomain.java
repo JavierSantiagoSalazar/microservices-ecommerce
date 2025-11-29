@@ -3,16 +3,17 @@ package com.link.product.domain.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
-public class Product {
+public class PageDomain<T> {
 
-    private Long id;
-    private String productName;
-    private String description;
-    private Double price;
-    private String category;
-    private String brand;
-    private String imageUrl;
+    private List<T> content;
+    private int pageNumber;
+    private int pageSize;
+    private long totalElements;
+    private int totalPages;
+    private boolean last;
 
 }

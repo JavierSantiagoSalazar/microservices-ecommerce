@@ -1,8 +1,8 @@
-package com.pragma.emazon_stock.domain.exceptions;
+package com.link.product.domain.exceptions;
 
-public class NoContentArticleException extends RuntimeException{
+public class NoContentProductException extends RuntimeException{
 
-    public NoContentArticleException() {
+    public NoContentProductException() {
         super();
     }
 }

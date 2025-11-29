@@ -1,19 +1,23 @@
-package com.pragma.emazon_stock.domain.spi;
+package com.link.product.domain.spi;
 
-import com.pragma.emazon_stock.domain.model.Article;
 
-import java.util.List;
+import com.link.product.domain.model.PageDomain;
+import com.link.product.domain.model.Product;
 
-public interface ArticlePersistencePort {
+import java.util.Optional;
 
-    Article saveArticle(Article article);
+public interface ProductPersistencePort {
 
-    Boolean checkIfArticleExists(String articleName);
+    Product saveProduct(Product product);
 
-    List<Article> getArticlesByIds(List<Integer> articleIds);
+    Boolean checkIfProductExists(String productName);
 
-    List<Article> getAllArticles();
+    Optional<Product> getProductById(Long id);
 
-    Boolean saveAllArticles(List<Article> articles);
+    Optional<Product> updateProductById(Long id, Product product);
+
+    void deleteProductById(Long id);
+
+    PageDomain<Product> getAllProducts(int page, int size, String sortBy, String sortDirection);
 
 }
