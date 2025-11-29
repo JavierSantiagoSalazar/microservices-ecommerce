@@ -1,18 +1,13 @@
-package com.pragma.emazon_stock.infrastructure.out.jpa.repository;
+package com.link.product.infrastructure.out.jpa.repository;
 
-import com.pragma.emazon_stock.infrastructure.out.jpa.entity.ArticleEntity;
+import com.link.product.domain.model.Product;
+import com.link.product.infrastructure.out.jpa.entity.ProductEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
 
-public interface ArticleRepository extends JpaRepository<ArticleEntity, Integer> {
+public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 
-    Optional<ArticleEntity> findByArticleName(String articleName);
-
-    @Query("SELECT a FROM ArticleEntity a WHERE a.articleId IN (:articleIds)")
-    List<ArticleEntity> findAllByArticleId(@Param("articleIds") List<Integer> articleIds);
+    Optional<ProductEntity> findByProductName(String productName);
 
 }

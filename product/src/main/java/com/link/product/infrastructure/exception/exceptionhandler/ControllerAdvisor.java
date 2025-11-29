@@ -1,106 +1,146 @@
-package com.link.product.infrastructure.configuration.exceptionhandler;
+package com.link.product.infrastructure.exception.exceptionhandler;
 
+import com.link.product.domain.exceptions.NoContentProductException;
 import com.link.product.domain.exceptions.ProductAlreadyExistsException;
-import com.pragma.emazon_stock.domain.exceptions.ProductAlreadyExistsException;
-import com.pragma.emazon_stock.domain.exceptions.ProductCategoryOutOfBoundsException;
-import com.pragma.emazon_stock.domain.exceptions.ProductNotFoundException;
-import com.pragma.emazon_stock.domain.exceptions.BrandAlreadyExistsException;
-import com.pragma.emazon_stock.domain.exceptions.BrandDoesNotExistException;
-import com.pragma.emazon_stock.domain.exceptions.CategoryAlreadyExistsException;
-import com.pragma.emazon_stock.domain.exceptions.CategoryDoesNotExistException;
-import com.pragma.emazon_stock.domain.exceptions.InvalidFilteringParameterException;
-import com.pragma.emazon_stock.domain.exceptions.JwtIsEmptyException;
-import com.pragma.emazon_stock.domain.exceptions.NoContentProductException;
-import com.pragma.emazon_stock.domain.exceptions.NoContentBrandException;
-import com.pragma.emazon_stock.domain.exceptions.NoContentCategoryException;
-import com.pragma.emazon_stock.domain.exceptions.NotUniqueProductCategoriesException;
-import com.pragma.emazon_stock.domain.exceptions.PageOutOfBoundsException;
-import com.pragma.emazon_stock.domain.exceptions.SupplyAmountMismatchException;
-import com.pragma.emazon_stock.domain.exceptions.TransactionServiceUnavailableException;
-import com.pragma.emazon_stock.domain.exceptions.UnauthorizedException;
-import com.pragma.emazon_stock.domain.utils.Constants;
-import com.pragma.emazon_stock.infrastructure.configuration.exception.dto.PaginatedResponse;
-import com.pragma.emazon_stock.infrastructure.configuration.exception.dto.Response;
-import feign.RetryableException;
+import com.link.product.domain.exceptions.ProductNotFoundException;
+import com.link.product.domain.utils.Constants;
+import com.link.product.infrastructure.exception.exceptionhandler.dto.JsonApiError;
+import com.link.product.infrastructure.exception.exceptionhandler.dto.JsonApiErrorResponse;
+import jakarta.validation.ConstraintViolationException;
 import org.apache.coyote.BadRequestException;
-import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.net.ConnectException;
+import java.util.ArrayList;
 import java.util.List;
 
 @ControllerAdvice
 public class ControllerAdvisor {
 
-   
     @ExceptionHandler(ProductAlreadyExistsException.class)
-    public ResponseEntity<Response> handleProductAlreadyExistsException(
-            ProductAlreadyExistsException productAlreadyExistsException
+    public ResponseEntity<JsonApiErrorResponse> handleProductAlreadyExistsException(
+            ProductAlreadyExistsException ex
     ) {
-        return new ResponseEntity<>(
-                Response.builder()
-                        .statusCode(HttpStatus.CONFLICT)
-                        .message(Constants.ARTICLE_ALREADY_EXISTS_EXCEPTION_MESSAGE)
-                        .build(),
-                HttpStatus.CONFLICT
+        JsonApiError error = new JsonApiError(
+                String.valueOf(HttpStatus.CONFLICT.value()),
+                "Product Already Exists",
+                Constants.PRODUCT_ALREADY_EXISTS_EXCEPTION_MESSAGE,
+                null
         );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .contentType(MediaType.parseMediaType(Constants.JSON_API_MEDIA_TYPE))
+                .body(new JsonApiErrorResponse(error));
     }
 
     @ExceptionHandler(ProductNotFoundException.class)
-    public ResponseEntity<Response> handleProductNotFoundException(
-            ProductNotFoundException productNotFoundException
+    public ResponseEntity<JsonApiErrorResponse> handleProductNotFoundException(
+            ProductNotFoundException ex
     ) {
-        return new ResponseEntity<>(
-                Response.builder()
-                        .statusCode(HttpStatus.NOT_FOUND)
-                        .message(productNotFoundException.getMessage() + productNotFoundException.getNotFoundIds())
-                        .build(),
-                HttpStatus.NOT_FOUND
+        JsonApiError error = new JsonApiError(
+                String.valueOf(HttpStatus.NOT_FOUND.value()),
+                "Product Not Found",
+                ex.getMessage() + ex.getNotFoundId(),
+                null
         );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.parseMediaType(Constants.JSON_API_MEDIA_TYPE))
+                .body(new JsonApiErrorResponse(error));
     }
 
     @ExceptionHandler(NoContentProductException.class)
-    public ResponseEntity<Response> handleNoContentProductException(
-            NoContentProductException noContentProductException
+    public ResponseEntity<JsonApiErrorResponse> handleNoContentProductException(
+            NoContentProductException ex
     ) {
-        return new ResponseEntity<>(
-                Response.builder()
-                        .statusCode(HttpStatus.NO_CONTENT)
-                        .message(Constants.ARTICLE_NO_CONTENT_MESSAGE)
-                        .build(),
-                HttpStatus.NO_CONTENT
+        JsonApiError error = new JsonApiError(
+                String.valueOf(HttpStatus.NO_CONTENT.value()),
+                "No Products Found",
+                Constants.PRODUCT_NO_CONTENT_MESSAGE,
+                null
         );
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .contentType(MediaType.parseMediaType(Constants.JSON_API_MEDIA_TYPE))
+                .body(new JsonApiErrorResponse(error));
     }
 
     @ExceptionHandler(ConnectException.class)
-    public ResponseEntity<Response> handleConnectException(
-            ConnectException connectException
+    public ResponseEntity<JsonApiErrorResponse> handleConnectException(
+            ConnectException ex
     ) {
-        return new ResponseEntity<>(
-                Response.builder()
-                        .statusCode(HttpStatus.SERVICE_UNAVAILABLE)
-                        .message(connectException.getMessage())
-                        .build(),
-                HttpStatus.SERVICE_UNAVAILABLE
+        JsonApiError error = new JsonApiError(
+                String.valueOf(HttpStatus.SERVICE_UNAVAILABLE.value()),
+                "Service Unavailable",
+                ex.getMessage(),
+                null
         );
+
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .contentType(MediaType.parseMediaType(Constants.JSON_API_MEDIA_TYPE))
+                .body(new JsonApiErrorResponse(error));
     }
 
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<Response> handleBadRequestException(
-            BadRequestException badRequestException
+    public ResponseEntity<JsonApiErrorResponse> handleBadRequestException(
+            BadRequestException ex
     ) {
-        return new ResponseEntity<>(
-                Response.builder()
-                        .statusCode(HttpStatus.BAD_REQUEST)
-                        .message(badRequestException.getMessage())
-                        .build(),
-                HttpStatus.BAD_REQUEST
+        JsonApiError error = new JsonApiError(
+                String.valueOf(HttpStatus.BAD_REQUEST.value()),
+                "Bad Request",
+                ex.getMessage(),
+                null
         );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.parseMediaType(Constants.JSON_API_MEDIA_TYPE))
+                .body(new JsonApiErrorResponse(error));
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<JsonApiErrorResponse> handleValidationExceptions(
+            MethodArgumentNotValidException ex
+    ) {
+        List<JsonApiError> errors = new ArrayList<>();
+
+        ex.getBindingResult().getFieldErrors().forEach(fieldError -> {
+            JsonApiError error = new JsonApiError(
+                    String.valueOf(HttpStatus.BAD_REQUEST.value()),
+                    "Validation Error",
+                    fieldError.getDefaultMessage(),
+                    fieldError.getField()
+            );
+            errors.add(error);
+        });
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.parseMediaType(Constants.JSON_API_MEDIA_TYPE))
+                .body(new JsonApiErrorResponse(errors));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<JsonApiErrorResponse> handleConstraintViolationException(
+            ConstraintViolationException ex
+    ) {
+        List<JsonApiError> errors = new ArrayList<>();
+
+        ex.getConstraintViolations().forEach(violation -> {
+            JsonApiError error = new JsonApiError(
+                    String.valueOf(HttpStatus.BAD_REQUEST.value()),
+                    "Constraint Violation",
+                    violation.getMessage(),
+                    violation.getPropertyPath().toString()
+            );
+            errors.add(error);
+        });
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.parseMediaType(Constants.JSON_API_MEDIA_TYPE))
+                .body(new JsonApiErrorResponse(errors));
+    }
 }

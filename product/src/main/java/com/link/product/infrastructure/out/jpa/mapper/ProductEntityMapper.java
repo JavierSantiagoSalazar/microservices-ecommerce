@@ -1,24 +1,15 @@
-package com.link.product.infrastructure.out.mapper;
+package com.link.product.infrastructure.out.jpa.mapper;
 
-import com.pragma.emazon_stock.domain.model.Article;
-import com.pragma.emazon_stock.domain.utils.Constants;
-import com.pragma.emazon_stock.infrastructure.out.jpa.entity.ArticleEntity;
+import com.link.product.domain.model.Product;
+import com.link.product.infrastructure.out.jpa.entity.ProductEntity;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
 
-import java.util.List;
-
-@Mapper(componentModel = Constants.SPRING_COMPONENT_MODEL)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ProductEntityMapper {
 
-    ArticleEntity toEntity(Article article);
+    ProductEntity toEntity(Product domain);
 
-    @Mapping(target = "articleBrand.brandArticles", ignore = true)
-    Article toDomain(ArticleEntity articleEntity);
-
-    @Mapping(target = "articleBrand.brandArticles", ignore = true)
-    List<Article> toDomainList(List<ArticleEntity> articleEntityList);
-
-    List<ArticleEntity> toEntityList(List<Article> articles);
+    Product toDomain(ProductEntity entity);
 
 }

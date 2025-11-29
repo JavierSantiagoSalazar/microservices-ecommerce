@@ -1,171 +1,284 @@
-package com.pragma.emazon_stock.infrastructure.input.rest;
+package com.link.product.infrastructure.input;
 
-import com.pragma.emazon_stock.application.dto.article.ArticleRequest;
-import com.pragma.emazon_stock.application.dto.article.ArticleResponse;
-import com.pragma.emazon_stock.application.dto.article.SupplyRequest;
-import com.pragma.emazon_stock.application.handler.article.ArticleHandler;
-import com.pragma.emazon_stock.domain.model.Pagination;
-import com.pragma.emazon_stock.domain.utils.Constants;
-import com.pragma.emazon_stock.domain.utils.HttpStatusCode;
+import com.link.product.application.dto.JsonApiResponse;
+import com.link.product.application.dto.PageResponse;
+import com.link.product.application.dto.ProductRequest;
+import com.link.product.application.dto.ProductResponse;
+import com.link.product.application.handler.ProductHandler;
+import com.link.product.domain.utils.Constants;
+import com.link.product.domain.utils.HttpStatusCodes;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/article")
+@RequestMapping("/product")
 @RequiredArgsConstructor
-public class ArticleRestController {
+@Validated
+public class ProductRestController {
 
-    @Value("${article.name.path}")
-    private String articleNamePath;
+    private final ProductHandler productHandler;
 
-    private final ArticleHandler articleHandler;
-
-    @Operation(summary = Constants.ARTICLE_SUMMARY)
+    @Operation(summary = Constants.CREATE_PRODUCT_SUMMARY)
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = HttpStatusCode.CREATED,
-                    description = Constants.ARTICLE_CREATED,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = HttpStatusCode.CONFLICT,
-                    description = Constants.ARTICLE_ALREADY_EXISTS,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = HttpStatusCode.BAD_REQUEST,
-                    description = Constants.ARTICLE_DUPLICATE_CATEGORY_NAMES,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = HttpStatusCode.BAD_REQUEST,
-                    description = Constants.ARTICLE_CATEGORY_LIMIT,
-                    content = @Content
-            )
-    })
-    @PostMapping("/")
-    public ResponseEntity<Void> createArticle(@Valid @RequestBody ArticleRequest articleRequest) {
-
-        articleHandler.createArticle(articleRequest);
-
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path(articleNamePath)
-                .buildAndExpand(articleRequest.getArticleName())
-                .toUri();
-
-        return ResponseEntity.created(location).build();
-    }
-
-    @Operation(summary = Constants.ARTICLE_GET_ALL_SUMMARY)
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = HttpStatusCode.OK,
-                    description = Constants.ARTICLE_OBTAINED,
+                    responseCode = HttpStatusCodes.CREATED,
+                    description = Constants.CREATED_PRODUCT,
                     content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            array = @ArraySchema(schema = @Schema(implementation = ArticleResponse.class))
+                            mediaType = Constants.JSON_API_MEDIA_TYPE,
+                            schema = @Schema(implementation = JsonApiResponse.class)
                     )
             ),
             @ApiResponse(
-                    responseCode = HttpStatusCode.NO_CONTENT,
-                    description = Constants.ARTICLE_NO_CONTENT,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = HttpStatusCode.BAD_REQUEST,
-                    description = Constants.ARTICLE_INVALID_FILTER,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = HttpStatusCode.BAD_REQUEST,
-                    description = Constants.ARTICLE_PAGE_OUT_OF_RANGE,
+                    responseCode = HttpStatusCodes.CONFLICT,
+                    description = Constants.PRODUCT_ALREADY_EXISTS,
                     content = @Content
             )
     })
-    @GetMapping("/")
-    public ResponseEntity<Pagination<ArticleResponse>> getArticles(
-            @RequestParam(defaultValue = Constants.ASC_SORT_ORDER) String sortOrder,
-            @RequestParam(defaultValue = Constants.ARTICLE_NAME) String filterBy,
-            @RequestParam(required = false) String brandName,
-            @RequestParam(required = false) String categoryName,
-            @RequestParam(defaultValue = Constants.PAGE_DEFAULT_VALUE) Integer page,
-            @RequestParam(defaultValue = Constants.SIZE_DEFAULT_VALUE) Integer size
+    @PostMapping(value = "/", produces = Constants.JSON_API_MEDIA_TYPE, consumes = Constants.JSON_API_MEDIA_TYPE)
+    public ResponseEntity<JsonApiResponse<ProductResponse>> createProduct(
+            @Valid @RequestBody ProductRequest productRequest,
+            HttpServletRequest request
     ) {
-        return ResponseEntity.ok(articleHandler.getArticles(sortOrder, filterBy, brandName, categoryName, page, size));
+        ProductResponse created = productHandler.createProduct(productRequest);
+
+        JsonApiResponse<ProductResponse> response = new JsonApiResponse<>(created);
+
+        Map<String, String> links = new HashMap<>();
+        links.put(Constants.LINK_SELF, request.getRequestURL().toString() + created.getId());
+        response.setLinks(links);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .contentType(MediaType.parseMediaType(Constants.JSON_API_MEDIA_TYPE))
+                .body(response);
     }
 
-    @Operation(summary = Constants.ARTICLE_SUMMARY)
+    @Operation(summary = Constants.GET_PRODUCT_BY_ID_SUMMARY)
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = HttpStatusCode.OK,
-                    description = Constants.ARTICLE_UPDATED,
+                    responseCode = HttpStatusCodes.OK,
+                    description = Constants.FOUND_PRODUCT,
+                    content = @Content(
+                            mediaType = Constants.JSON_API_MEDIA_TYPE,
+                            schema = @Schema(implementation = JsonApiResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = HttpStatusCodes.NOT_FOUND,
+                    description = Constants.PRODUCT_NOT_FOUND,
                     content = @Content
             ),
             @ApiResponse(
-                    responseCode = HttpStatusCode.NOT_FOUND,
-                    description = Constants.ARTICLE_NOT_FOUND,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = HttpStatusCode.BAD_REQUEST,
-                    description = Constants.ARTICLE_INVALID_REQUEST,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = HttpStatusCode.BAD_REQUEST,
-                    description = Constants.SUPPLY_MISMATCH,
+                    responseCode = HttpStatusCodes.BAD_REQUEST,
+                    description = Constants.INVALID_PRODUCT_ID,
                     content = @Content
             )
     })
-    @PatchMapping("/")
-    public ResponseEntity<Boolean> updateArticleAmount(@Valid @RequestBody SupplyRequest supplyRequest) {
-        boolean isUpdated = articleHandler.updateArticleSupply(supplyRequest);
-        return ResponseEntity.ok(isUpdated);
+    @GetMapping(value = "/{id}", produces = Constants.JSON_API_MEDIA_TYPE)
+    public ResponseEntity<JsonApiResponse<ProductResponse>> getProductById(
+            @Valid @PathVariable @Min(1) Long id,
+            HttpServletRequest request
+    ) {
+        ProductResponse productResponse = productHandler.getProductById(id);
+
+        JsonApiResponse<ProductResponse> response = new JsonApiResponse<>(productResponse);
+
+        Map<String, String> links = new HashMap<>();
+        links.put(Constants.LINK_SELF, request.getRequestURL().toString());
+        response.setLinks(links);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(Constants.JSON_API_MEDIA_TYPE))
+                .body(response);
     }
 
-    @Operation(summary = Constants.GET_ARTICLES_BY_IDS)
+    @Operation(summary = Constants.UPDATE_PRODUCT_SUMMARY)
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = HttpStatusCode.OK,
-                    description = Constants.ARTICLES_FOUND,
+                    responseCode = HttpStatusCodes.OK,
+                    description = Constants.UPDATED_PRODUCT,
+                    content = @Content(
+                            mediaType = Constants.JSON_API_MEDIA_TYPE,
+                            schema = @Schema(implementation = JsonApiResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = HttpStatusCodes.NOT_FOUND,
+                    description = Constants.PRODUCT_NOT_FOUND,
                     content = @Content
             ),
             @ApiResponse(
-                    responseCode = HttpStatusCode.NOT_FOUND,
-                    description = Constants.ARTICLE_NOT_FOUND,
+                    responseCode = HttpStatusCodes.BAD_REQUEST,
+                    description = Constants.INVALID_PRODUCT_ID,
                     content = @Content
             ),
             @ApiResponse(
-                    responseCode = HttpStatusCode.BAD_REQUEST,
-                    description = Constants.INVALID_REQUEST,
+                    responseCode = HttpStatusCodes.CONFLICT,
+                    description = Constants.PRODUCT_ALREADY_EXISTS,
                     content = @Content
             )
     })
-    @GetMapping("/get-articles-by-ids")
-    public ResponseEntity<List<ArticleResponse>> getArticlesByIds(@RequestParam List<Integer> articleIdList) {
-        List<ArticleResponse> responseList = articleHandler.getArticlesByIds(articleIdList);
-        return ResponseEntity.ok(responseList);
+    @PutMapping(value = "/{id}", produces = Constants.JSON_API_MEDIA_TYPE, consumes = Constants.JSON_API_MEDIA_TYPE)
+    public ResponseEntity<JsonApiResponse<ProductResponse>> updateProductById(
+            @Valid @PathVariable @Min(1) Long id,
+            @Valid @RequestBody ProductRequest productRequest,
+            HttpServletRequest request
+    ) {
+        ProductResponse updatedProduct = productHandler.updateProductById(id, productRequest);
+
+        JsonApiResponse<ProductResponse> response = new JsonApiResponse<>(updatedProduct);
+
+        Map<String, String> links = new HashMap<>();
+        links.put(Constants.LINK_SELF, request.getRequestURL().toString());
+        response.setLinks(links);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(Constants.JSON_API_MEDIA_TYPE))
+                .body(response);
+    }
+
+    @Operation(summary = Constants.DELETE_PRODUCT_SUMMARY)
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = HttpStatusCodes.NO_CONTENT,
+                    description = Constants.DELETED_PRODUCT,
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = HttpStatusCodes.NOT_FOUND,
+                    description = Constants.PRODUCT_NOT_FOUND,
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = HttpStatusCodes.BAD_REQUEST,
+                    description = Constants.INVALID_PRODUCT_ID,
+                    content = @Content
+            )
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProductById(@Valid @PathVariable @Min(1) Long id) {
+
+        productHandler.deleteProductById(id);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @Operation(summary = Constants.GET_ALL_PRODUCTS_SUMMARY)
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = HttpStatusCodes.OK,
+                    description = Constants.PRODUCTS_OBTAINED,
+                    content = @Content(
+                            mediaType = Constants.JSON_API_MEDIA_TYPE,
+                            schema = @Schema(implementation = JsonApiResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = HttpStatusCodes.NO_CONTENT,
+                    description = Constants.NO_PRODUCTS_FOUND,
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = HttpStatusCodes.BAD_REQUEST,
+                    description = Constants.INVALID_PAGE_PARAMETERS,
+                    content = @Content
+            )
+    })
+    @GetMapping(value = "/", produces = Constants.JSON_API_MEDIA_TYPE)
+    public ResponseEntity<JsonApiResponse<List<ProductResponse>>> getAllProducts(
+            @RequestParam(defaultValue = Constants.PAGE_DEFAULT_VALUE) int page,
+            @RequestParam(defaultValue = Constants.SIZE_DEFAULT_VALUE) int size,
+            @RequestParam(defaultValue = Constants.SORT_BY_DEFAULT) String sortBy,
+            @RequestParam(defaultValue = Constants.SORT_DIRECTION_ASC) String sortDirection,
+            HttpServletRequest request
+    ) {
+        PageResponse<ProductResponse> pageResult = productHandler.getAllProducts(page, size, sortBy, sortDirection);
+
+        JsonApiResponse<List<ProductResponse>> response = new JsonApiResponse<>(pageResult.getContent());
+
+        String baseUrl = request.getRequestURL().toString();
+
+        addPaginationLinks(response, baseUrl, pageResult, page, size, sortBy, sortDirection);
+
+        Map<String, Object> meta = new HashMap<>();
+        meta.put(Constants.META_TOTAL_PAGES, pageResult.getTotalPages());
+        meta.put(Constants.META_TOTAL_ELEMENTS, pageResult.getTotalElements());
+        meta.put(Constants.META_CURRENT_PAGE, pageResult.getPageNumber());
+        meta.put(Constants.META_PAGE_SIZE, pageResult.getPageSize());
+        response.setMeta(meta);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(Constants.JSON_API_MEDIA_TYPE))
+                .body(response);
+    }
+
+    private String buildPageUrl(String baseUrl, int page, int size, String sortBy, String sortDirection) {
+        return String.format(Constants.PAGE_URL_TEMPLATE, baseUrl, page, size, sortBy, sortDirection);
+    }
+
+    private void addPaginationLinks(
+            JsonApiResponse<?> response,
+            String baseUrl,
+            PageResponse<?> pageResult,
+            int page,
+            int size,
+            String sortBy,
+            String sortDirection
+    ) {
+        Map<String, String> links = new HashMap<>();
+        links.put(Constants.LINK_SELF, buildPageUrl(baseUrl, page, size, sortBy, sortDirection));
+        links.put(Constants.LINK_FIRST, buildPageUrl(baseUrl, Constants.FIRST_PAGE, size, sortBy, sortDirection));
+        links.put(Constants.LINK_LAST, buildPageUrl(
+                baseUrl,
+                pageResult.getTotalPages() - Constants.PAGE_INCREMENT,
+                size,
+                sortBy,
+                sortDirection
+        ));
+
+        if (!pageResult.isLast()) {
+            links.put(Constants.LINK_NEXT, buildPageUrl(
+                    baseUrl,
+                    page + Constants.PAGE_INCREMENT,
+                    size,
+                    sortBy,
+                    sortDirection
+                    )
+            );
+        }
+        if (page > Constants.FIRST_PAGE) {
+            links.put(Constants.LINK_PREV, buildPageUrl(
+                    baseUrl,
+                    page - Constants.PAGE_INCREMENT,
+                    size,
+                    sortBy,
+                    sortDirection
+            ));
+        }
+        response.setLinks(links);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.pragma.emazon_stock.infrastructure.out.jpa.entity;
+package com.link.product.infrastructure.out.jpa.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,44 +13,40 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 @Entity
-@Table(name = "article")
-@Data
-@AllArgsConstructor
+@Table(name = "products")
+@Getter
+@Setter
 @NoArgsConstructor
-public class ArticleEntity {
+@AllArgsConstructor
+public class ProductEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "article_id")
-    private Integer articleId;
+    private Long id;
 
-    @Column(name = "article_name", nullable = false ,unique = true, length = 120)
-    private String articleName;
+    @Column(name = "product_name", nullable = false, length = 120)
+    private String productName;
 
-    @Column(name = "article_description", nullable = false ,length = 160)
-    private String articleDescription;
+    @Column(nullable = false, length = 500)
+    private String description;
 
-    @Column(name = "article_amount", nullable = false)
-    private Integer articleAmount;
+    @Column(nullable = false)
+    private Double price;
 
-    @Column(name = "article_price", nullable = false)
-    private Double articlePrice;
+    @Column(nullable = false, length = 60)
+    private String category;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "brand_id", nullable = false)
-    private BrandEntity articleBrand;
+    @Column(nullable = false, length = 60)
+    private String brand;
 
-    @ManyToMany
-    @JoinTable(
-            name = "article_categories",
-            joinColumns = @JoinColumn(name = "article_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
-    private List<CategoryEntity> articleCategories;
+    @Column(name = "image_url", length = 255)
+    private String imageUrl;
 
 }
