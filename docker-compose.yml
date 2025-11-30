@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # ================== MYSQL PRODUCT ==================
+  product-db:
+    image: mysql:8.4
+    container_name: product-db
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: product_db
+    ports:
+      - "3307:3306"  # Acceso externo localhost:3307
+    volumes:
+      - product-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-ppassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - shop-network
+
+  # ================== MYSQL INVENTORY ==================
+  inventory-db:
+    image: mysql:8.4
+    container_name: inventory-db
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: inventory_db
+    ports:
+      - "3308:3306"
+    volumes:
+      - inventory-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-ppassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - shop-network
+
+  # ================== PRODUCT SERVICE ==================
+  product-service:
+    build:
+      context: ./product
+      dockerfile: Dockerfile
+    container_name: product-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - product-db
+    networks:
+      - shop-network
+
+  # ================== INVENTORY SERVICE ==================
+  inventory-service:
+    build:
+      context: ./inventory
+      dockerfile: Dockerfile
+    container_name: inventory-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - inventory-db
+      - product-service
+    networks:
+      - shop-network
+
+# ================== PERSISTENCE ==================
+volumes:
+  product-db-data:
+  inventory-db-data:
+
+# ================== INTERN NETWORK ==================
+networks:
+  shop-network:
+    driver: bridge
