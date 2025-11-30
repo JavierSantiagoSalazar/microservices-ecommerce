@@ -1,6 +1,5 @@
 package com.link.product.domain.api;
 
-import com.link.product.application.dto.ProductResponse;
 import com.link.product.domain.model.PageDomain;
 import com.link.product.domain.model.Product;
 

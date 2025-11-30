@@ -12,9 +12,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class JsonApiErrorResponse {
+
     private List<JsonApiError> errors;
 
     public JsonApiErrorResponse(JsonApiError error) {
         this.errors = List.of(error);
     }
+
 }

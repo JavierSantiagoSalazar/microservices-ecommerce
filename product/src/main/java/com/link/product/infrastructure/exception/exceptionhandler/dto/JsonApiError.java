@@ -10,8 +10,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class JsonApiError {
+
     private String status;
     private String title;
     private String detail;
     private String source;
+
 }

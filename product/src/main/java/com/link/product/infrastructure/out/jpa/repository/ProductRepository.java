@@ -1,6 +1,5 @@
 package com.link.product.infrastructure.out.jpa.repository;
 
-import com.link.product.domain.model.Product;
 import com.link.product.infrastructure.out.jpa.entity.ProductEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -25,7 +25,8 @@ public class ProductUseCase implements ProductServicePort {
 
     @Override
     public Product getProductById(Long id) {
-        return productPersistencePort.getProductById(id).orElseThrow(() -> new ProductNotFoundException(id));
+        return productPersistencePort.getProductById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
     }
 
     @Override
@@ -58,4 +59,5 @@ public class ProductUseCase implements ProductServicePort {
     private boolean checkIfArticleExists(String productName) {
         return productPersistencePort.checkIfProductExists(productName);
     }
+
 }

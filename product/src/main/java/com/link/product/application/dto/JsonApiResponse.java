@@ -8,6 +8,7 @@ import java.util.Map;
 @Getter
 @Setter
 public class JsonApiResponse<T> {
+
     private T data;
     private Map<String, String> links;
     private Map<String, Object> meta;
@@ -15,5 +16,6 @@ public class JsonApiResponse<T> {
     public JsonApiResponse(T data) {
         this.data = data;
     }
+
 }
 

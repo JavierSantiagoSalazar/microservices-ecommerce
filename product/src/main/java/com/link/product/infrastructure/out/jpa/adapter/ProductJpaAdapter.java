@@ -85,6 +85,7 @@ public class ProductJpaAdapter implements ProductPersistencePort {
                 pageResult.getTotalPages(),
                 pageResult.isLast()
         );
+
     }
 
 }

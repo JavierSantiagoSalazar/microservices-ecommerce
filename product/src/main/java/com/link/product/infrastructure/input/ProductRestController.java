@@ -63,6 +63,7 @@ public class ProductRestController {
             @Valid @RequestBody ProductRequest productRequest,
             HttpServletRequest request
     ) {
+
         ProductResponse created = productHandler.createProduct(productRequest);
 
         JsonApiResponse<ProductResponse> response = new JsonApiResponse<>(created);
@@ -74,6 +75,7 @@ public class ProductRestController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .contentType(MediaType.parseMediaType(Constants.JSON_API_MEDIA_TYPE))
                 .body(response);
+
     }
 
     @Operation(summary = Constants.GET_PRODUCT_BY_ID_SUMMARY)
@@ -102,6 +104,7 @@ public class ProductRestController {
             @Valid @PathVariable @Min(1) Long id,
             HttpServletRequest request
     ) {
+
         ProductResponse productResponse = productHandler.getProductById(id);
 
         JsonApiResponse<ProductResponse> response = new JsonApiResponse<>(productResponse);
@@ -113,6 +116,7 @@ public class ProductRestController {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(Constants.JSON_API_MEDIA_TYPE))
                 .body(response);
+
     }
 
     @Operation(summary = Constants.UPDATE_PRODUCT_SUMMARY)
@@ -147,6 +151,7 @@ public class ProductRestController {
             @Valid @RequestBody ProductRequest productRequest,
             HttpServletRequest request
     ) {
+
         ProductResponse updatedProduct = productHandler.updateProductById(id, productRequest);
 
         JsonApiResponse<ProductResponse> response = new JsonApiResponse<>(updatedProduct);
@@ -158,6 +163,7 @@ public class ProductRestController {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(Constants.JSON_API_MEDIA_TYPE))
                 .body(response);
+
     }
 
     @Operation(summary = Constants.DELETE_PRODUCT_SUMMARY)
@@ -184,6 +190,7 @@ public class ProductRestController {
         productHandler.deleteProductById(id);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
     }
 
     @Operation(summary = Constants.GET_ALL_PRODUCTS_SUMMARY)
@@ -215,6 +222,7 @@ public class ProductRestController {
             @RequestParam(defaultValue = Constants.SORT_DIRECTION_ASC) String sortDirection,
             HttpServletRequest request
     ) {
+
         PageResponse<ProductResponse> pageResult = productHandler.getAllProducts(page, size, sortBy, sortDirection);
 
         JsonApiResponse<List<ProductResponse>> response = new JsonApiResponse<>(pageResult.getContent());
@@ -233,6 +241,7 @@ public class ProductRestController {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(Constants.JSON_API_MEDIA_TYPE))
                 .body(response);
+
     }
 
     private String buildPageUrl(String baseUrl, int page, int size, String sortBy, String sortDirection) {
@@ -248,6 +257,7 @@ public class ProductRestController {
             String sortBy,
             String sortDirection
     ) {
+
         Map<String, String> links = new HashMap<>();
         links.put(Constants.LINK_SELF, buildPageUrl(baseUrl, page, size, sortBy, sortDirection));
         links.put(Constants.LINK_FIRST, buildPageUrl(baseUrl, Constants.FIRST_PAGE, size, sortBy, sortDirection));
@@ -269,6 +279,7 @@ public class ProductRestController {
                     )
             );
         }
+
         if (page > Constants.FIRST_PAGE) {
             links.put(Constants.LINK_PREV, buildPageUrl(
                     baseUrl,
@@ -278,7 +289,9 @@ public class ProductRestController {
                     sortDirection
             ));
         }
+
         response.setLinks(links);
+
     }
 
 }

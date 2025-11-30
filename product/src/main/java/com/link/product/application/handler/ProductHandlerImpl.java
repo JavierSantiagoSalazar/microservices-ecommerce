@@ -25,15 +25,19 @@ public class ProductHandlerImpl implements ProductHandler {
 
     @Override
     public ProductResponse createProduct(ProductRequest productRequest) {
+
         Product product = productRequestMapper.toDomain(productRequest);
         Product savedProduct = productServicePort.saveProduct(product);
         return productResponseMapper.toResponse(savedProduct);
+
     }
 
     @Override
     public ProductResponse getProductById(Long id) {
+
         Product product = productServicePort.getProductById(id);
         return productResponseMapper.toResponse(product);
+
     }
 
     @Override

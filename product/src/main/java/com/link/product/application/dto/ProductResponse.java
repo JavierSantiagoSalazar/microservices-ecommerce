@@ -2,12 +2,14 @@ package com.link.product.application.dto;
 
 import io.katharsis.resource.annotations.JsonApiId;
 import io.katharsis.resource.annotations.JsonApiResource;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @JsonApiResource(type = "products")
 @Getter
 @Setter
+@AllArgsConstructor
 public class ProductResponse {
 
     @JsonApiId

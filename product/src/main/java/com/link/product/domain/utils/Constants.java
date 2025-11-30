@@ -79,4 +79,17 @@ public class Constants {
     public static final String PRODUCT_DOES_NOT_EXIST_MESSAGE = "The product was not found for the provided ID: ";
     public static final String PRODUCT_NO_CONTENT_MESSAGE = "There are currently no products available";
 
+    // Security - Headers
+    public static final String HEADER_X_API_KEY = "X-API-Key";
+    public static final String HEADER_AUTHORIZATION = "Authorization";
+    public static final String API_KEY_PREFIX = "ApiKey ";
+
+    // Security - Error Messages
+    public static final String UNAUTHORIZED_TITLE = "Unauthorized";
+    public static final String INVALID_API_KEY_DETAIL = "Invalid or missing API key";
+    public static final String INVALID_API_KEY_LOG = "Invalid API key from IP: {}";
+
+    // HTTP Status
+    public static final String STATUS_401 = "401";
+
 }
