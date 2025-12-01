@@ -27,6 +27,10 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
 
         String apiKey = extractApiKey(request);
 
@@ -48,13 +52,16 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
                     Constants.UNAUTHORIZED_TITLE,
                     Constants.INVALID_API_KEY_DETAIL
             ));
+
             return;
+
         }
 
         filterChain.doFilter(request, response);
     }
 
     private String extractApiKey(HttpServletRequest request) {
+
         String apiKey = request.getHeader(Constants.HEADER_X_API_KEY);
         if (apiKey != null) return apiKey;
 
@@ -64,6 +71,6 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
         }
 
         return null;
-    }
 
+    }
 }
