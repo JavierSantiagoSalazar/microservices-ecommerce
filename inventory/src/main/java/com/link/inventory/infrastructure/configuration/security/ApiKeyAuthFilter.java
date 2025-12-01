@@ -27,6 +27,11 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
+
         String apiKey = extractApiKey(request);
 
         if (!validApiKey.equals(apiKey)) {
